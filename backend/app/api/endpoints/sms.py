@@ -105,23 +105,31 @@ async def test_sms_json(sms_data: SMSTestRequest):
     }
 
 @router.post("/webhook")
-async def sms_webhook(
-    request: Request,
-    Body: str = Form(...),
-    From: str = Form(...)
-):
+async def sms_webhook(request: Request):
     """
     Comprehensive SMS webhook handling all MamaSafe commands
     """
-    # Log all form data for debugging
-    form_data = await request.form()
-    logger.info(f"Webhook received - Form data: {dict(form_data)}")
-    
-    text = Body.strip()
-    from_number = From.strip()
-
-    logger.info(f"SMS from {from_number}: {text}")
-    print(f"DEBUG: SMS from {from_number}: {text}")  # Console logging
+    try:
+        form_data = await request.form()
+        logger.info(f"Webhook received - Form data: {dict(form_data)}")
+        print(f"DEBUG: All form data: {dict(form_data)}")
+        
+        text = form_data.get("Body", "").strip()
+        from_number = form_data.get("From", "").strip()
+        
+        if not text or not from_number:
+            logger.error(f"Missing required fields - Body: {text}, From: {from_number}")
+            resp = MessagingResponse()
+            resp.message("Error: Missing message data")
+            return Response(content=str(resp), media_type="application/xml")
+        
+        logger.info(f"SMS from {from_number}: {text}")
+        print(f"DEBUG: SMS from {from_number}: {text}")
+    except Exception as e:
+        logger.error(f"Error parsing form data: {e}")
+        resp = MessagingResponse()
+        resp.message("Service error. Try again.")
+        return Response(content=str(resp), media_type="application/xml")
 
     resp = MessagingResponse()
 
