@@ -304,18 +304,29 @@ async def sms_webhook(request: Request):
             # TODO: Escalate to emergency contacts/providers
 
         elif command == "HELP":
-            help_text = """MamaSafe Commands:
-REG [Name] [Location] [License] - Register as provider
-PATIENT [Name] [Age] [Weeks] [Phone] - Register patient
-CHECK [ID] [Drug] [Symptoms] - Safety check
-MULTI [ID] [Drug1+Drug2] [Symptoms] - Multi-drug check
-DRUG [Medication] [Symptoms] - Self-check
-APPT [ID] [Date] [Time] - Schedule appointment
-HISTORY [ID] - Patient history
-ALERT [ID] [Message] - Send alert
-EMERGENCY [Symptoms] - Emergency help
-HELP - This help"""
-            resp.message(help_text[:160])
+            help_text = """📱 MamaSafe SMS Commands:
+
+🏥 PROVIDER:
+REG Dr.John Lagos LIC123 - Register as healthcare provider
+
+👶 PATIENT:
+PATIENT Mary 25 30weeks +234xxx - Register pregnant patient
+
+💊 MEDICATION SAFETY:
+DRUG Paracetamol headache - Check if drug is safe during pregnancy
+CHECK 123 Aspirin fever - Check drug for specific patient
+MULTI 123 Aspirin+Paracetamol - Check multiple drugs
+
+🚨 EMERGENCY:
+EMERGENCY severe bleeding - Send emergency alert
+
+📋 MANAGEMENT:
+APPT 123 2024-01-15 10:00 - Schedule appointment
+HISTORY 123 - View patient history
+ALERT 123 Take medication - Send patient alert
+
+Try: DRUG Paracetamol headache"""
+            resp.message(help_text)
 
         else:
             # For testing - echo back the message
