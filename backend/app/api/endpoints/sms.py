@@ -168,14 +168,20 @@ async def sms_webhook(request: Request):
             if len(args) < 4:
                 resp.message("Invalid format. Use: PATIENT [Name] [Age] [Weeks] [Phone]")
             else:
-                name = " ".join(args[:-3])
+                full_name = " ".join(args[:-3])
                 age = args[-3]
                 weeks = args[-2]
                 phone = args[-1]
 
+                # Split name into first and last
+                name_parts = full_name.split()
+                first_name = name_parts[0] if name_parts else "Patient"
+                last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else "Unknown"
+
                 # Create patient via Dorra EMR
                 patient_data = {
-                    "name": name,
+                    "first_name": first_name,
+                    "last_name": last_name,
                     "age": int(age),
                     "phone": phone,
                     "gestational_weeks": int(weeks.replace("weeks", ""))
