@@ -51,7 +51,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
   const { } = useTranslation()
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, logout, user } = useAuth()
 
   // Check authentication state on app load
   useEffect(() => {
@@ -60,6 +60,15 @@ function App() {
       setShowDashboard(true)
     }
   }, [isAuthenticated, showAuth])
+
+  // Auto-navigate to dashboard if already authenticated
+  useEffect(() => {
+    const token = localStorage.getItem('mamasafe_token')
+    if (token && showLanding) {
+      setShowLanding(false)
+      setShowDashboard(true)
+    }
+  }, [])
 
   const showLoadingAndNavigate = (message: string, nextAction: () => void, delay = 3000) => {
     setIsLoading(true)
@@ -349,7 +358,7 @@ function App() {
         console.log('Analyzing drugs for patient:', { patientId, drugs })
         setShowDrugAnalysis(false)
         setShowMedicationResults(true)
-      }
+      }}
     />
   }
 
@@ -363,7 +372,7 @@ function App() {
         console.log('Analyzing drug:', { drugName, symptoms })
         setShowSingleDrugCheck(false)
         setShowMedicationResults(true)
-      }
+      }}
       onViewHistory={() => console.log('View history')}
     />
   }
@@ -372,21 +381,31 @@ function App() {
     return <DashboardScreen 
       stats={mockDashboardStats}
       recentPatients={mockRecentPatients}
+      clinicName={user?.full_name ? `${user.full_name}'s Clinic` : 'MamaSafe Clinic'}
+      location="Lagos, Nigeria"
+      userAvatar="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150"
+      notificationCount={3}
       onPatientClick={(patient) => console.log('Patient clicked:', patient)}
       onMedicationCheck={(patientId, medication) => {
         console.log('Medication check:', { patientId, medication })
-        setShowDashboard(false)
-        setShowSingleDrugCheck(true)
+        showLoadingAndNavigate('Preparing medication check...', () => {
+          setShowDashboard(false)
+          setShowSingleDrugCheck(true)
+        }, 1500)
       }}
       onDrugAnalysis={() => {
         console.log('Drug Analysis clicked')
-        setShowDashboard(false)
-        setShowDrugAnalysis(true)
+        showLoadingAndNavigate('Loading drug analysis...', () => {
+          setShowDashboard(false)
+          setShowDrugAnalysis(true)
+        }, 1500)
       }}
       onNewPatient={() => {
         console.log('Dashboard New Patient clicked')
-        setShowDashboard(false)
-        setShowPatientRegistration(true)
+        showLoadingAndNavigate('Opening patient registration...', () => {
+          setShowDashboard(false)
+          setShowPatientRegistration(true)
+        }, 1000)
       }}
       onAppointments={() => {
         setShowDashboard(false)
@@ -395,8 +414,10 @@ function App() {
       onReports={() => console.log('Reports')}
       onViewAllPatients={() => {
         console.log('View all patients')
-        setShowDashboard(false)
-        setShowPatientManagement(true)
+        showLoadingAndNavigate('Loading patient management...', () => {
+          setShowDashboard(false)
+          setShowPatientManagement(true)
+        }, 1500)
       }}
       onNotificationClick={() => console.log('Notifications')}
       onLogout={() => {
