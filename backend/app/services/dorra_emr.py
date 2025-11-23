@@ -187,6 +187,39 @@ class DorraEMRService:
             logger.error(f"Error retrieving encounters for patient {patient_id}: {str(e)}")
             return []
 
+    async def get_patients(self, search: str = None) -> Optional[Dict[str, Any]]:
+        """
+        List all patients in your team.
+        GET /v1/patients
+        """
+        try:
+            params = {}
+            if search:
+                params["search"] = search
+                
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.base_url}/v1/patients",
+                    headers=self.headers,
+                    params=params,
+                    timeout=10.0
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    logger.info(f"Successfully retrieved patients list")
+                    return result
+                else:
+                    logger.error(f"Error retrieving patients: {response.status_code} - {response.text}")
+                    return {"results": []}
+                    
+        except httpx.HTTPError as e:
+            logger.error(f"HTTP error retrieving patients: {str(e)}")
+            return {"results": []}
+        except Exception as e:
+            logger.error(f"Unexpected error retrieving patients: {str(e)}")
+            return {"results": []}
+
     async def log_visit(self, visit_data: Dict[str, Any]) -> bool:
         """
         Log a visit using AI EMR endpoint.

@@ -26,62 +26,70 @@ const MedicationResultsScreen: React.FC<MedicationResultsScreenProps> = ({
   const [isSending, setIsSending] = useState(false)
 
   const getRiskConfig = (risk: string) => {
-    switch (risk) {
-      case 'low':
-        return {
-          bgGradient: 'from-green-50 to-purple-50',
-          borderColor: 'border-primary/20',
-          textColor: 'text-gray-900',
-          buttonPrimary: 'bg-primary text-white',
-          buttonSecondary: 'bg-primary/10 text-primary',
-          icon: Shield,
-          iconBg: 'bg-primary/10',
-          iconColor: 'text-primary'
-        }
-      case 'moderate':
-        return {
-          bgGradient: 'from-orange-100 to-orange-50',
-          borderColor: 'border-caution/30',
-          textColor: 'text-caution-dark',
-          buttonPrimary: 'bg-primary text-white',
-          buttonSecondary: 'bg-primary/10 text-primary',
-          icon: AlertTriangle,
-          iconBg: 'bg-caution-light',
-          iconColor: 'text-caution'
-        }
-      case 'high':
-        return {
-          bgGradient: 'from-risk-high-bg to-transparent',
-          borderColor: 'border-risk-high/50',
-          textColor: 'text-gray-900',
-          buttonPrimary: 'bg-primary text-white shadow-lg shadow-primary/30',
-          buttonSecondary: 'bg-risk-high/10 text-risk-high',
-          icon: AlertTriangle,
-          iconBg: 'bg-risk-high-bg',
-          iconColor: 'text-risk-high'
-        }
-      case 'critical':
-        return {
-          bgGradient: 'from-danger-light to-transparent',
-          borderColor: 'border-danger/50',
-          textColor: 'text-danger',
-          buttonPrimary: 'bg-primary text-white',
-          buttonSecondary: 'bg-white text-danger border border-danger/50',
-          icon: AlertTriangle,
-          iconBg: 'bg-danger-light',
-          iconColor: 'text-danger'
-        }
-      default:
-        return {
-          bgGradient: 'from-gray-50 to-white',
-          borderColor: 'border-gray-200',
-          textColor: 'text-gray-900',
-          buttonPrimary: 'bg-primary text-white',
-          buttonSecondary: 'bg-gray-100 text-gray-700',
-          icon: Pill,
-          iconBg: 'bg-gray-100',
-          iconColor: 'text-gray-600'
-        }
+    const normalizedRisk = risk?.toLowerCase() || ''
+    
+    if (normalizedRisk.includes('safe') || normalizedRisk.includes('low')) {
+      return {
+        bgGradient: 'from-green-50 to-purple-50',
+        borderColor: 'border-primary/20',
+        textColor: 'text-gray-900',
+        buttonPrimary: 'bg-primary text-white',
+        buttonSecondary: 'bg-primary/10 text-primary',
+        icon: Shield,
+        iconBg: 'bg-primary/10',
+        iconColor: 'text-primary'
+      }
+    }
+    
+    if (normalizedRisk.includes('caution') || normalizedRisk.includes('moderate')) {
+      return {
+        bgGradient: 'from-orange-100 to-orange-50',
+        borderColor: 'border-caution/30',
+        textColor: 'text-caution-dark',
+        buttonPrimary: 'bg-primary text-white',
+        buttonSecondary: 'bg-primary/10 text-primary',
+        icon: AlertTriangle,
+        iconBg: 'bg-caution-light',
+        iconColor: 'text-caution'
+      }
+    }
+    
+    if (normalizedRisk.includes('high') || normalizedRisk.includes('major')) {
+      return {
+        bgGradient: 'from-risk-high-bg to-transparent',
+        borderColor: 'border-risk-high/50',
+        textColor: 'text-gray-900',
+        buttonPrimary: 'bg-primary text-white shadow-lg shadow-primary/30',
+        buttonSecondary: 'bg-risk-high/10 text-risk-high',
+        icon: AlertTriangle,
+        iconBg: 'bg-risk-high-bg',
+        iconColor: 'text-risk-high'
+      }
+    }
+    
+    if (normalizedRisk.includes('contraindicated') || normalizedRisk.includes('critical')) {
+      return {
+        bgGradient: 'from-danger-light to-transparent',
+        borderColor: 'border-danger/50',
+        textColor: 'text-danger',
+        buttonPrimary: 'bg-primary text-white',
+        buttonSecondary: 'bg-white text-danger border border-danger/50',
+        icon: AlertTriangle,
+        iconBg: 'bg-danger-light',
+        iconColor: 'text-danger'
+      }
+    }
+    
+    // Default fallback
+    return {
+      bgGradient: 'from-gray-50 to-white',
+      borderColor: 'border-gray-200',
+      textColor: 'text-gray-900',
+      buttonPrimary: 'bg-primary text-white',
+      buttonSecondary: 'bg-gray-100 text-gray-700',
+      icon: Pill,
+      iconBg: 'bg-gray-100',
+      iconColor: 'text-gray-600'
     }
   }
 

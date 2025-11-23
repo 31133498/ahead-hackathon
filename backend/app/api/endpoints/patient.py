@@ -249,14 +249,22 @@ async def search_patients(
     if current_user.role not in ["provider", "admin"]:
         raise HTTPException(status_code=403, detail="Provider access required")
     
-    # In production, this would search the EMR database
-    # For now, return mock data
-    return {
-        "patients": [
-            {"id": 176, "name": "Amina Ibrahim", "phone": "+234803123456", "gestational_week": 24},
-            {"id": 177, "name": "Fatima Yusuf", "phone": "+234807654321", "gestational_week": 18}
-        ]
-    }
+    # Call Dorra EMR API to search patients
+    result = await dorra_emr.get_patients(search=query)
+    
+    # Extract patients list from result
+    patients_list = []
+    if result and "results" in result:
+        for p in result["results"]:
+            patients_list.append({
+                "id": p.get("id"),
+                "name": f"{p.get('first_name', '')} {p.get('last_name', '')}".strip(),
+                "phone": p.get("phone_number", ""),
+                "gestational_week": 0, # Default as EMR might not return this directly in list
+                "risk_level": "safe" # Default
+            })
+            
+    return {"patients": patients_list}
 
 @router.post("/invite")
 async def invite_patient(

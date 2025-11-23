@@ -19,8 +19,8 @@ const SingleDrugCheckScreen: React.FC<SingleDrugCheckScreenProps> = ({
   onAnalyze,
   onViewHistory
 }) => {
-  const { t, currentLanguage, setLanguage } = useTranslation()
-  const { checkDrugSafety, loading, error, result } = useMedicationCheck()
+  const { t } = useTranslation()
+  const { checkDrugSafety, loading, error } = useMedicationCheck()
   const [drugName, setDrugName] = useState('')
   const [symptoms, setSymptoms] = useState('')
   const [reportLanguage, setReportLanguage] = useState('en')
@@ -49,12 +49,17 @@ const SingleDrugCheckScreen: React.FC<SingleDrugCheckScreenProps> = ({
   ]
 
   const getRiskColor = (level: string) => {
-    switch (level) {
-      case 'high-risk': return 'text-red-600 bg-red-100'
-      case 'caution': return 'text-orange-600 bg-orange-100'
-      case 'safe': return 'text-green-600 bg-green-100'
-      default: return 'text-gray-600 bg-gray-100'
+    const normalizedLevel = level?.toLowerCase() || ''
+    if (normalizedLevel.includes('high') || normalizedLevel.includes('contraindicated') || normalizedLevel.includes('major')) {
+      return 'text-red-600 bg-red-100'
     }
+    if (normalizedLevel.includes('caution') || normalizedLevel.includes('moderate')) {
+      return 'text-orange-600 bg-orange-100'
+    }
+    if (normalizedLevel.includes('safe') || normalizedLevel.includes('low') || normalizedLevel.includes('minor')) {
+      return 'text-green-600 bg-green-100'
+    }
+    return 'text-gray-600 bg-gray-100'
   }
 
   const handleAnalyze = async () => {
@@ -165,14 +170,12 @@ const SingleDrugCheckScreen: React.FC<SingleDrugCheckScreenProps> = ({
             </div>
             <motion.div
               className={`flex items-center justify-center size-10 rounded-full ${
-                displayPatient.riskLevel === 'high-risk' ? 'bg-red-100' : 
-                displayPatient.riskLevel === 'caution' ? 'bg-orange-100' : 'bg-green-100'
+                getRiskColor(displayPatient.riskLevel).split(' ')[1]
               }`}
               whileHover={{ scale: 1.1 }}
             >
               <AlertTriangle className={`h-5 w-5 ${
-                displayPatient.riskLevel === 'high-risk' ? 'text-red-600' : 
-                displayPatient.riskLevel === 'caution' ? 'text-orange-600' : 'text-green-600'
+                getRiskColor(displayPatient.riskLevel).split(' ')[0]
               }`} />
             </motion.div>
           </div>
