@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from '../../contexts/TranslationContext'
+import { useAnalytics } from '../../hooks/useAnalytics'
 import { DashboardStats, Patient } from '../../types/dashboard'
 import DashboardHeader from '../sections/DashboardHeader'
 import StatCard from '../ui/StatCard'
